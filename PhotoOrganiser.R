@@ -25,7 +25,7 @@ myFiles <- list.files(path = myDir, full.names = TRUE, include.dirs = FALSE, rec
 myFiles <- myFiles[!dir.exists(myFiles)]
 
 # Just test on a short extract of the files first
-myFiles <- myFiles[1:100]
+#myFiles <- myFiles[1:100]
 
 # Now try getting the image metadata for those files
 myMetadata <- read_exif(myFiles,tags=c("SourceFile","FileName", "Directory","CreateDate","DateTimeOriginal","FileModifyDate","MIMEType","FileType","FileTypeExtension"))
