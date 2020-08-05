@@ -5,10 +5,10 @@ library(dplyr)
 # This script will recurisvely read files from a directroy, read the image/video metadata, and then save a copy of those files in an output location, orgainsed by year
 
 # Folder that we want to read our files from
-myDir <- 'C:/Users/dcurrie/OneDrive/Pictures/SharedPictures'
+myDir <- 'C:/Users/david/OneDrive/Pictures/SharedPictures'
 
 # Location where we will save the organised photos and videos
-myOutputFolder <- 'C:/Users/dcurrie/Pictures/Organised'
+myOutputFolder <- 'C:/Users/david/Pictures/Organised'
 
 # Function to save files to new location
 saveMyFile <- function(originalFile, originalFileName, year,newFileName){
@@ -37,9 +37,13 @@ myMetadata$myDateAsDate <- as.Date(myMetadata$myDate, '%Y:%m:%d')
 myMetadata$myYear <- as.numeric(format(myMetadata$myDateAsDate,'%Y'))
 
 # Now see if its an image or video
-myMetadata$myFileType <- NA
+myMetadata$myFileType <- ''
 myMetadata[grepl('image',myMetadata$MIMEType),'myFileType'] <- 'Image'
 myMetadata[grepl('video',myMetadata$MIMEType),'myFileType'] <- 'Video'
+myMetadata[myMetadata$myFileType == '','myFileType'] <- NA
+
+# save the metadata to csv
+write.csv(myMetadata,"myMetadata.csv")
 
 # Create a directory for each year (if required)
 for (aYear in myMetadata$myYear){
@@ -49,13 +53,16 @@ for (aYear in myMetadata$myYear){
 
 myFilesToSave <- myMetadata[!is.na(myMetadata$myFileType),]
 
-myFilesToSave$myNewFileName <- paste(row.names(myMetadata),'_',myMetadata$FileName,sep="")
+myFilesToSave$myNewFileName <- paste(row.names(myFilesToSave),'_',myFilesToSave$FileName,sep="")
 
 # Use a small subset for testing
 #myFilesToSave <- myFilesToSave[1:2,]
 
 # Copy the files to our new folders
 mySaveResults <- saveMyFile(myFilesToSave$SourceFile, myFilesToSave$FileName,myFilesToSave$myYear,myFilesToSave$myNewFileName)
+
+# save mySaveResults to csv
+write.csv(mySaveResults,"mySaveResults.csv")
 
 # See how many files copied successfully
 print(paste(length(mySaveResults[mySaveResults == TRUE]),"files copied successfully, ", length(mySaveResults[mySaveResults == FALSE]),"files failed (includes pre-existing files that weren't over-written)"))
